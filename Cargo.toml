@@ -30,7 +30,7 @@ ignore = "0.4.26"
 # Serialization
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.150"
-toml = { version = "1.1.2+spec-1.1.0", features = ["parse", "display"] }
+toml = { version = "1.1.2", features = ["parse", "display"] }
 
 # Compression
 zstd = { version = "0.13.3", optional = true }

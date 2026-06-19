@@ -6,6 +6,7 @@ use crate::{
         config::{Config, parser::parse_config},
         detect::run_detect,
         error::BinfuseError,
+        zig_ffi,
     },
 };
 
@@ -35,24 +36,36 @@ pub fn run_build(
 
     let builder = get_builder(&metadata.language)?;
     let binary_path = builder.build(&config, &metadata)?;
+    if !metadata.assets.is_empty() {
+        let temp_binary_path = config.build.output.with_extension("binfuse_temp");
+        let assets_dir = metadata.source_path.join("assets");
 
-    if let Some(parent) = config.build.output.parent() {
-        std::fs::create_dir_all(parent).map_err(|e| {
+        std::fs::copy(&binary_path, &temp_binary_path)?;
+
+        zig_ffi::embed_assets(&temp_binary_path, &assets_dir, &temp_binary_path)?;
+
+        zig_ffi::generate_wrapper(&temp_binary_path, &config.build.output, 8080)?;
+
+        std::fs::remove_file(temp_binary_path)?;
+    } else {
+        if let Some(parent) = config.build.output.parent() {
+            std::fs::create_dir_all(parent).map_err(|e| {
+                BinfuseError::BuildError(format!(
+                    "Failed to create output directory {}: {}",
+                    parent.display(),
+                    e
+                ))
+            })?;
+        }
+        std::fs::copy(&binary_path, &config.build.output).map_err(|e| {
             BinfuseError::BuildError(format!(
-                "Failed to create output directory {}: {}",
-                parent.display(),
+                "Failed to copy binary from {} to {}: {}",
+                binary_path.display(),
+                config.build.output.display(),
                 e
             ))
         })?;
     }
-    std::fs::copy(&binary_path, &config.build.output).map_err(|e| {
-        BinfuseError::BuildError(format!(
-            "Failed to copy binary from {} to {}: {}",
-            binary_path.display(),
-            config.build.output.display(),
-            e
-        ))
-    })?;
     log::info!("Build successful: {}", config.build.output.display());
 
     Ok(())

@@ -1,0 +1,62 @@
+[package]
+name = "binfuse"
+version = "0.1.0"
+edition = "2024"
+authors = ["YetAnotherMechanicusEnjoyer"]
+description = "Embed any project into a single self-contained static binary."
+license = "GPL-3.0"
+readme = "README.md"
+
+[dependencies]
+# CLI
+clap = { version = "4.6.1", features = ["derive", "env"] }
+
+# Errors
+anyhow = "1.0.102"
+thiserror = "2.0.18"
+
+# Logging
+log = "0.4.32"
+env_logger = "0.11.10"
+
+# ANSI
+colored = "3.1.1"
+
+# Fs
+walkdir = "2.5.0"
+globset = "0.4.18"
+ignore = "0.4.26"
+
+# Serialization
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.150"
+toml = { version = "1.1.2+spec-1.1.0", features = ["parse", "display"] }
+
+# Compression
+zstd = { version = "0.13.3", optional = true }
+lz4 = { version = "1.28.1", optional = true }
+
+# Web Server
+axum = { version = "0.8.9", optional = true }
+tokio = { version = "1.0", features = ["full"], optional = true }
+
+# FFI
+libc = "1.0.0-alpha.3"
+
+# Regex
+regex = "1.12.4"
+
+[dev-dependencies]
+# Tests
+tempfile = "3.10"
+
+[features]
+default = []
+compression = ["zstd", "lz4"]
+web_server = ["axum", "tokio"]
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = true

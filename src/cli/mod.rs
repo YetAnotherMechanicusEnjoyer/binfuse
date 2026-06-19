@@ -69,7 +69,7 @@ impl Cli {
                 no_compress,
             } => crate::core::build::run_build(source, output, config, !no_compress),
             Commands::Targets => todo!(), //crate::core::targets::run_targets(),
-            Commands::Clean { path } => todo!(), //crate::core::clean::run_clean(&path),
+            Commands::Clean { path: _ } => todo!(), //crate::core::clean::run_clean(&path),
         }
     }
 }

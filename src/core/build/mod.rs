@@ -60,13 +60,13 @@ pub fn run_build(
 
 fn get_builder(language: &Language) -> Result<Box<dyn Builder>> {
     match language {
-        Language::Rust => Ok(Box::new(rust::RustBuilder::new())),
-        Language::Zig => Ok(Box::new(zig::ZigBuilder::new())),
-        Language::NodeJs => Ok(Box::new(nodejs::NodeJsBuilder::new())),
-        Language::Go => Ok(Box::new(go::GoBuilder::new())),
-        Language::C => Ok(Box::new(c::CBuilder::new())),
-        Language::Python => Ok(Box::new(python::PythonBuilder::new())),
-        Language::Static => Ok(Box::new(staticb::StaticBuilder::new())),
+        Language::Rust => Ok(Box::new(rust::RustBuilder)),
+        Language::Zig => Ok(Box::new(zig::ZigBuilder)),
+        Language::NodeJs => Ok(Box::new(nodejs::NodeJsBuilder)),
+        Language::Go => Ok(Box::new(go::GoBuilder)),
+        Language::C => Ok(Box::new(c::CBuilder)),
+        Language::Python => Ok(Box::new(python::PythonBuilder)),
+        Language::Static => Ok(Box::new(staticb::StaticBuilder)),
     }
 }
 

@@ -31,7 +31,7 @@ edition = "2024"
     let main_rs = src_dir.join("main.rs");
     fs::write(&main_rs, "fn main() {}").unwrap();
 
-    let builder = RustBuilder::new();
+    let builder = RustBuilder;
     let config = binfuse::core::config::Config::default();
     let metadata = run_detect(project_dir.to_str().unwrap(), false).unwrap();
 

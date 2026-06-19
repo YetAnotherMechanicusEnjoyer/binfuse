@@ -7,13 +7,8 @@ use std::{
     process::Command,
 };
 
+#[derive(Default)]
 pub struct RustBuilder;
-
-impl RustBuilder {
-    pub fn new() -> Self {
-        Self
-    }
-}
 
 impl Builder for RustBuilder {
     fn build(&self, _config: &Config, metadata: &ProjectMetadata) -> Result<PathBuf> {
@@ -25,11 +20,14 @@ impl Builder for RustBuilder {
             .current_dir(project_dir)
             .output()
             .map_err(|e| {
-                BinfuseError::BuildError(format!(
-                    "Failed to run `cargo build --release` in {}: {}",
-                    project_dir.display(),
-                    e
-                ))
+                if e.kind() == std::io::ErrorKind::NotFound {
+                    BinfuseError::BuildError("'cargo' not found.".to_string())
+                } else {
+                    BinfuseError::BuildError(format!(
+                        "Failed to run 'cargo build --release' in {}: {e}",
+                        project_dir.display(),
+                    ))
+                }
             })?;
 
         if !output.status.success() {
@@ -42,6 +40,14 @@ impl Builder for RustBuilder {
         let binary_name = get_binary_name(project_dir)?;
 
         let binary_path = project_dir.join("target").join("release").join(binary_name);
+
+        if !binary_path.exists() {
+            return Err(BinfuseError::BuildError(format!(
+                "Binary not found at {}",
+                binary_path.display()
+            ))
+            .into());
+        }
         Ok(binary_path)
     }
 }
@@ -50,9 +56,8 @@ fn get_binary_name(project_dir: &Path) -> Result<String> {
     let cargo_toml_path = project_dir.join("Cargo.toml");
     let cargo_toml_content = std::fs::read_to_string(&cargo_toml_path).map_err(|e| {
         BinfuseError::BuildError(format!(
-            "Failed to read Cargo.toml in {}: {}",
+            "Failed to read Cargo.toml in {}: {e}",
             project_dir.display(),
-            e
         ))
     })?;
 
@@ -63,7 +68,7 @@ fn get_binary_name(project_dir: &Path) -> Result<String> {
         .and_then(|caps| caps.get(1))
         .map(|m| m.as_str().to_string())
         .ok_or_else(|| {
-            BinfuseError::BuildError("Failed to find `name` in Cargo.toml".to_string())
+            BinfuseError::BuildError("Failed to find 'name' in Cargo.toml".to_string())
         })?;
 
     Ok(name)

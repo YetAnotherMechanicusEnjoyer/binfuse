@@ -4,13 +4,8 @@ use crate::{
 };
 use std::path::PathBuf;
 
+#[derive(Default)]
 pub struct StaticBuilder;
-
-impl StaticBuilder {
-    pub fn new() -> Self {
-        Self
-    }
-}
 
 impl Builder for StaticBuilder {
     fn build(&self, _config: &Config, _metadata: &ProjectMetadata) -> Result<PathBuf> {

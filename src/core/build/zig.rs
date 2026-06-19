@@ -4,13 +4,8 @@ use crate::{
 };
 use std::path::PathBuf;
 
+#[derive(Default)]
 pub struct ZigBuilder;
-
-impl ZigBuilder {
-    pub fn new() -> Self {
-        Self
-    }
-}
 
 impl Builder for ZigBuilder {
     fn build(&self, _config: &Config, _metadata: &ProjectMetadata) -> Result<PathBuf> {
